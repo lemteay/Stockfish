@@ -27,6 +27,10 @@
 
 using namespace Stockfish;
 
+#ifndef __clang__
+#error "Clang only"
+#endif
+
 int main(int argc, char* argv[]) {
     std::cout << engine_info() << std::endl;
 

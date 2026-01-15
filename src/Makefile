@@ -1117,14 +1117,14 @@ FORCE:
 
 clang-profile-make:
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
-	EXTRACXXFLAGS='-fprofile-generate ' \
+	EXTRACXXFLAGS='-fprofile-generate -mllvm -inline-threshold=500 ' \
 	EXTRALDFLAGS=' -fprofile-generate' \
 	all
 
 clang-profile-use:
 	$(XCRUN) $(LLVM_PROFDATA) merge -output=stockfish.profdata *.profraw
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
-	EXTRACXXFLAGS='-fprofile-use=stockfish.profdata' \
+	EXTRACXXFLAGS='-fprofile-use=stockfish.profdata -mllvm -inline-threshold=500' \
 	EXTRALDFLAGS='-fprofile-use ' \
 	all
 

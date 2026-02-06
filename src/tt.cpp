@@ -56,6 +56,7 @@ struct TTEntry {
     }
 
     bool is_occupied() const;
+    bool is_pv() const;
     void save(Key k, Value v, bool pv, Bound b, Depth d, Move m, Value ev, uint8_t generation8);
     // The returned age is a multiple of TranspositionTable::GENERATION_DELTA
     uint8_t relative_age(const uint8_t generation8) const;
@@ -88,6 +89,8 @@ static constexpr int GENERATION_MASK = (0xFF << GENERATION_BITS) & 0xFF;
 // we sacrifice the ability to store depths greater than 1<<8 less the offset, as asserted in `save`.)
 bool TTEntry::is_occupied() const { return bool(depth8); }
 
+bool TTEntry::is_pv() const { return bool(genBound8 & 0x4); }
+
 // Populates the TTEntry with a new node's data, possibly
 // overwriting an old position. The update is not atomic and can be racy.
 void TTEntry::save(
@@ -98,8 +101,8 @@ void TTEntry::save(
         move16 = m;
 
     // Overwrite less valuable entries (cheapest checks first)
-    if (b == BOUND_EXACT || uint16_t(k) != key16 || d - DEPTH_ENTRY_OFFSET + 2 * pv > depth8 - 4
-        || relative_age(generation8))
+    if (b == BOUND_EXACT || uint16_t(k) != key16 
+        || d - DEPTH_ENTRY_OFFSET + 2 * pv > depth8 - 4 + is_pv() * 2 || relative_age(generation8))
     {
         assert(d > DEPTH_ENTRY_OFFSET);
         assert(d < 256 + DEPTH_ENTRY_OFFSET);

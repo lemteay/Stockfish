@@ -97,8 +97,16 @@ void TTEntry::save(
     if (m || uint16_t(k) != key16)
         move16 = m;
 
+    int complexityBonus = 0;
+    if (value16 != VALUE_NONE && eval16 != VALUE_NONE)
+    {
+        complexityBonus = (std::abs(value16 - eval16) + 128) / 512;
+        complexityBonus = std::min(complexityBonus, 4);
+    }
+
     // Overwrite less valuable entries (cheapest checks first)
-    if (b == BOUND_EXACT || uint16_t(k) != key16 || d - DEPTH_ENTRY_OFFSET + 2 * pv > depth8 - 4
+    if (b == BOUND_EXACT || uint16_t(k) != key16
+        || d - DEPTH_ENTRY_OFFSET + 2 * pv > depth8 - 4 + complexityBonus
         || relative_age(generation8))
     {
         assert(d > DEPTH_ENTRY_OFFSET);

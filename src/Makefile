@@ -1137,8 +1137,8 @@ FORCE:
 
 clang-profile-make:
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
-	EXTRACXXFLAGS='-fprofile-generate ' \
-	EXTRALDFLAGS=' -fprofile-generate' \
+	EXTRACXXFLAGS='-fprofile-generate -fdebug-info-for-profiling' \
+	EXTRALDFLAGS='-fprofile-generate -fdebug-info-for-profiling' \
 	all
 
 clang-profile-use:

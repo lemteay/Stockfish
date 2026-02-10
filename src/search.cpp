@@ -1182,8 +1182,6 @@ moves_loop:  // When in check, search starts here
         // Step 16. Make the move
         do_move(pos, move, st, givesCheck, ss);
 
-        if (capture && givesCheck && improving)
-            extension++;
         // Add extension to new depth
         newDepth += extension;
         uint64_t nodeCount = rootNode ? uint64_t(nodes) : 0;
@@ -1212,6 +1210,9 @@ moves_loop:  // When in check, search starts here
         // For first picked move (ttMove) reduce reduction
         if (move == ttData.move)
             r -= 2151;
+        
+        if (capture && givesCheck && improving)
+            r -= 1447;
 
         if (capture)
             ss->statScore = 868 * int(PieceValue[pos.captured_piece()]) / 128

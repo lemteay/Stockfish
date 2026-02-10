@@ -872,7 +872,7 @@ ifeq ($(debug),no)
 	endif
 
 	ifeq ($(comp),$(filter $(comp),clang icx))
-		CXXFLAGS += -flto=full
+		CXXFLAGS += -flto=thin
 		ifeq ($(comp),icx)
 			CXXFLAGS += -fwhole-program-vtables
 		endif

@@ -286,16 +286,12 @@ class Worker {
 
     void ensure_network_replicated();
 
-    // Public because they need to be updatable by the stats
-    ButterflyHistory mainHistory;
-    LowPlyHistory    lowPlyHistory;
+    inline ButterflyHistory& main_history() { return mainHistory; };
+    inline LowPlyHistory&    low_ply_history() { return lowPlyHistory; };
 
-    CapturePieceToHistory           captureHistory;
-    ContinuationHistory             continuationHistory[2][2];
-    CorrectionHistory<Continuation> continuationCorrectionHistory;
-
-    TTMoveHistory    ttMoveHistory;
-    SharedHistories& sharedHistory;
+    inline CapturePieceToHistory& capture_history() { return captureHistory; };
+    inline SharedHistories&       shared_history() { return sharedHistory; };
+    inline SharedHistories&       shared_history() const { return sharedHistory; };
 
    private:
     void iterative_deepening();
@@ -328,31 +324,6 @@ class Worker {
 
     Value evaluate(const Position&);
 
-    LimitsType limits;
-
-    size_t                pvIdx, pvLast;
-    std::atomic<uint64_t> nodes, tbHits, bestMoveChanges;
-    int                   selDepth, nmpMinPly;
-
-    Value optimism[COLOR_NB];
-
-    Position  rootPos;
-    StateInfo rootState;
-    RootMoves rootMoves;
-    Depth     rootDepth, completedDepth;
-    Value     rootDelta;
-
-    size_t                    threadIdx, numaThreadIdx, numaTotal;
-    NumaReplicatedAccessToken numaAccessToken;
-
-    // Reductions lookup table initialized at startup
-    std::array<int, MAX_MOVES> reductions;  // [depth or moveNumber]
-
-    // The main thread has a SearchManager, the others have a NullSearchManager
-    std::unique_ptr<ISearchManager> manager;
-
-    Tablebases::Config tbConfig;
-
     const OptionsMap&                                         options;
     ThreadPool&                                               threads;
     TranspositionTable&                                       tt;
@@ -361,6 +332,41 @@ class Worker {
     // Used by NNUE
     Eval::NNUE::AccumulatorStack  accumulatorStack;
     Eval::NNUE::AccumulatorCaches refreshTable;
+
+    ButterflyHistory mainHistory;
+    LowPlyHistory    lowPlyHistory;
+
+    CapturePieceToHistory           captureHistory;
+    ContinuationHistory             continuationHistory[2][2];
+    CorrectionHistory<Continuation> continuationCorrectionHistory;
+
+    TTMoveHistory    ttMoveHistory;
+    SharedHistories& sharedHistory;
+
+    // Reductions lookup table initialized at startup
+    std::array<int, MAX_MOVES> reductions;  // [depth or moveNumber]
+
+    Position  rootPos;
+    StateInfo rootState;
+    RootMoves rootMoves;
+    Depth     rootDepth, completedDepth;
+    Value     rootDelta;
+
+    LimitsType limits;
+
+    Tablebases::Config tbConfig;
+
+    Value optimism[COLOR_NB];
+
+    // The main thread has a SearchManager, the others have a NullSearchManager
+    std::unique_ptr<ISearchManager> manager;
+
+    size_t                    threadIdx, numaThreadIdx, numaTotal;
+    NumaReplicatedAccessToken numaAccessToken;
+
+    std::atomic<uint64_t> nodes, tbHits, bestMoveChanges;
+    size_t                pvIdx, pvLast;
+    int                   selDepth, nmpMinPly;
 
     friend class Stockfish::ThreadPool;
     friend class SearchManager;

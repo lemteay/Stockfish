@@ -79,7 +79,7 @@ using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
 int correction_value(const Worker& w, const Position& pos, const Stack* const ss) {
     const Color us     = pos.side_to_move();
     const auto  m      = (ss - 1)->currentMove;
-    const auto& shared = w.sharedHistory;
+    const auto& shared = w.shared_history();
     const int   pcv    = shared.pawn_correction_entry(pos).at(us).pawn;
     const int   micv   = shared.minor_piece_correction_entry(pos).at(us).minor;
     const int   wnpcv  = shared.nonpawn_correction_entry<WHITE>(pos).at(us).nonPawnWhite;
@@ -106,7 +106,7 @@ void update_correction_history(const Position& pos,
     const Color us = pos.side_to_move();
 
     constexpr int nonPawnWeight = 178;
-    auto&         shared        = workerThread.sharedHistory;
+    auto&         shared        = workerThread.shared_history();
 
     shared.pawn_correction_entry(pos).at(us).pawn << bonus;
     shared.minor_piece_correction_entry(pos).at(us).minor << bonus * 156 / 128;
@@ -160,17 +160,17 @@ Search::Worker::Worker(SharedState&                    sharedState,
                        size_t                          numaTotalThreads,
                        NumaReplicatedAccessToken       token) :
     // Unpack the SharedState struct into member variables
-    sharedHistory(sharedState.sharedHistories.at(token.get_numa_index())),
-    threadIdx(threadId),
-    numaThreadIdx(numaThreadId),
-    numaTotal(numaTotalThreads),
-    numaAccessToken(token),
-    manager(std::move(sm)),
     options(sharedState.options),
     threads(sharedState.threads),
     tt(sharedState.tt),
     networks(sharedState.networks),
-    refreshTable(networks[token]) {
+    refreshTable(networks[token]),
+    sharedHistory(sharedState.sharedHistories.at(token.get_numa_index())),
+    manager(std::move(sm)),
+    threadIdx(threadId),
+    numaThreadIdx(numaThreadId),
+    numaTotal(numaTotalThreads),
+    numaAccessToken(token) {
     clear();
 }
 
@@ -1825,7 +1825,7 @@ void update_all_stats(const Position& pos,
                       Move            ttMove,
                       int             moveCount) {
 
-    CapturePieceToHistory& captureHistory = workerThread.captureHistory;
+    CapturePieceToHistory& captureHistory = workerThread.capture_history();
     Piece                  movedPiece     = pos.moved_piece(bestMove);
     PieceType              capturedPiece;
 
@@ -1893,14 +1893,14 @@ void update_quiet_histories(
   const Position& pos, Stack* ss, Search::Worker& workerThread, Move move, int bonus) {
 
     Color us = pos.side_to_move();
-    workerThread.mainHistory[us][move.raw()] << bonus;  // Untuned to prevent duplicate effort
+    workerThread.main_history()[us][move.raw()] << bonus;  // Untuned to prevent duplicate effort
 
     if (ss->ply < LOW_PLY_HISTORY_SIZE)
-        workerThread.lowPlyHistory[ss->ply][move.raw()] << bonus * 805 / 1024;
+        workerThread.low_ply_history()[ss->ply][move.raw()] << bonus * 805 / 1024;
 
     update_continuation_histories(ss, pos.moved_piece(move), move.to_sq(), bonus * 896 / 1024);
 
-    workerThread.sharedHistory.pawn_entry(pos)[pos.moved_piece(move)][move.to_sq()]
+    workerThread.shared_history().pawn_entry(pos)[pos.moved_piece(move)][move.to_sq()]
       << bonus * (bonus > 0 ? 905 : 505) / 1024;
 }
 

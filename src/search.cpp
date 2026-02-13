@@ -1862,7 +1862,7 @@ void update_all_stats(const Position& pos,
         movedPiece    = pos.moved_piece(move);
         capturedPiece = type_of(pos.piece_on(move.to_sq()));
         captureHistory[movedPiece][move.to_sq()][capturedPiece] << -actualMalus * 1448 / 1024;
-        actualMalus   = actualMalus * 950 / 1024;
+        actualMalus   = actualMalus * 990 / 1024;
     }
 }
 

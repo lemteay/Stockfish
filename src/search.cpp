@@ -1221,6 +1221,15 @@ moves_loop:  // When in check, search starts here
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 850 / 8192;
 
+        //
+        if (!ss->inCheck && is_valid((ss - 2)->staticEval) && is_valid((ss - 4)->staticEval))
+        {
+            int currentDelta  = std::abs(ss->staticEval - (ss - 2)->staticEval);
+            int previousDelta = std::abs((ss - 2)->staticEval - (ss - 4)->staticEval);
+            int evalAccel     = std::clamp(currentDelta - previousDelta, -512, 512);
+            r -= evalAccel * 28779 / 8192;
+        }
+
         // Scale up reductions for expected ALL nodes
         if (allNode)
             r += r / (depth + 1);

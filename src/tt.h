@@ -46,9 +46,9 @@ struct Cluster;
 
 // A copy of the data already in the entry (possibly collided). `probe` may be racy, resulting in inconsistent data.
 struct TTData {
-    Move  move;
     Value value, eval;
     Depth depth;
+    Move  move;
     Bound bound;
     bool  is_pv;
 
@@ -56,10 +56,10 @@ struct TTData {
 
     // clang-format off
     TTData(Move m, Value v, Value ev, Depth d, Bound b, bool pv) :
-        move(m),
         value(v),
         eval(ev),
         depth(d),
+        move(m),
         bound(b),
         is_pv(pv) {};
     // clang-format on

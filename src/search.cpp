@@ -62,12 +62,12 @@ void syzygy_extend_pv(const OptionsMap&            options,
 
 using namespace Search;
 
-int v1 = 50;
-int v2 = 0;
+int v1 = 49;
+int v2 = 2;
 int v3 = 9;
 
-TUNE(v1);
-TUNE(SetRange(-30, 60), v2);
+TUNE(SetRange(0, 100), v1);
+TUNE(SetRange(-256, 256), v2);
 TUNE(SetRange(-10, 30), v3);
 
 namespace {

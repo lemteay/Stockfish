@@ -62,14 +62,6 @@ void syzygy_extend_pv(const OptionsMap&            options,
 
 using namespace Search;
 
-int v1 = 49;
-int v2 = 2;
-int v3 = 9;
-
-TUNE(SetRange(0, 100), v1);
-TUNE(SetRange(-256, 256), v2);
-TUNE(SetRange(-10, 30), v3);
-
 namespace {
 
 constexpr int SEARCHEDLIST_CAPACITY = 32;
@@ -1255,8 +1247,8 @@ moves_loop:  // When in check, search starts here
             {
                 // Adjust full-depth search based on LMR results - if the result was
                 // good enough search deeper, if it was bad enough search shallower.
-                const bool doDeeperSearch    = d < newDepth && value > bestValue + v1 - ss->ttPv * v2;
-                const bool doShallowerSearch = value < bestValue + v3;
+                const bool doDeeperSearch = d < newDepth && value > bestValue + 50 - ss->ttPv * 18;
+                const bool doShallowerSearch = value < bestValue + 11;
 
                 newDepth += doDeeperSearch - doShallowerSearch;
 

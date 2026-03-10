@@ -1257,7 +1257,7 @@ moves_loop:  // When in check, search starts here
 
                 // Post LMR continuation history updates
                 update_continuation_histories(ss, movedPiece, move.to_sq(),
-                                              1342 + 30 * priorReduction);
+                                              1342 + 40 * std::min(priorReduction, 5));
             }
         }
 

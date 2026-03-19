@@ -45,13 +45,13 @@ class AccumulatorStack;
 std::string trace(Position& pos, const Eval::NNUE::Networks& networks);
 
 int   simple_eval(const Position& pos);
-bool  use_smallnet(const Position& pos, bool pv);
+bool  use_smallnet(const Position& pos, bool ttPv);
 Value evaluate(const NNUE::Networks&          networks,
                const Position&                pos,
                Eval::NNUE::AccumulatorStack&  accumulators,
                Eval::NNUE::AccumulatorCaches& caches,
                int                            optimism,
-               bool                           pv);
+               bool                           ttPv);
 }  // namespace Eval
 
 }  // namespace Stockfish

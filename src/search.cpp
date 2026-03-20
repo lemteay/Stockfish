@@ -681,6 +681,7 @@ Value Search::Worker::search(
     ss->followPV = rootNode
                 || ((ss - 1)->followPV && static_cast<size_t>(ss->ply - 1) < lastIterationPV.size()
                     && (ss - 1)->currentMove == lastIterationPV[ss->ply - 1]);
+    ss->singularExtension = 0;
 
     // Check for the available remaining time
     if (is_mainthread())
@@ -1203,6 +1204,8 @@ moves_loop:  // When in check, search starts here
         // Step 16. Make the move
         do_move(pos, move, st, givesCheck, ss);
 
+        ss->singularExtension = extension;
+
         // Add extension to new depth
         newDepth += extension;
         uint64_t nodeCount = rootNode ? uint64_t(nodes) : 0;
@@ -1242,6 +1245,8 @@ moves_loop:  // When in check, search starts here
 
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 428 / 4096;
+
+        r -= (ss - 1)->singularExtension * 151;
 
         // Scale up reductions for expected ALL nodes
         if (allNode)

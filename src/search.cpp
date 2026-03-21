@@ -1204,7 +1204,7 @@ moves_loop:  // When in check, search starts here
         // Step 16. Make the move
         do_move(pos, move, st, givesCheck, ss);
 
-        ss->singularExtension = extension;
+        ss->singularExtension = ((ss - 1)->singularExtension + 2 * extension) / 3;
 
         // Add extension to new depth
         newDepth += extension;

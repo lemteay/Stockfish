@@ -1204,7 +1204,7 @@ moves_loop:  // When in check, search starts here
         // Step 16. Make the move
         do_move(pos, move, st, givesCheck, ss);
 
-        ss->singularExtension = ((ss - 1)->singularExtension + 2 * extension) / 3;
+        ss->singularExtension = (ss - 1)->singularExtension;
 
         // Add extension to new depth
         newDepth += extension;
@@ -1246,7 +1246,7 @@ moves_loop:  // When in check, search starts here
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 428 / 4096;
 
-        r -= (ss - 1)->singularExtension * 151;
+        r -= (ss - 1)->singularExtension * std::max(201 - 17 * depth, 0);
 
         // Scale up reductions for expected ALL nodes
         if (allNode)

@@ -152,6 +152,12 @@ bool is_shuffling(Move move, Stack* const ss, const Position& pos) {
 
 }  // namespace
 
+int v1 = 200;
+int v2 = 15;
+
+TUNE(v1);
+TUNE(SetRange(-100, 100), v2);
+
 Search::Worker::Worker(SharedState&                    sharedState,
                        std::unique_ptr<ISearchManager> sm,
                        size_t                          threadId,
@@ -1246,7 +1252,7 @@ moves_loop:  // When in check, search starts here
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 428 / 4096;
 
-        r -= (ss - 1)->singularExtension * std::max(201 - 17 * depth, 0);
+        r -= (ss - 1)->singularExtension * std::max(v1 - v2 * depth, 0);
 
         // Scale up reductions for expected ALL nodes
         if (allNode)

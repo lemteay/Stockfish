@@ -155,8 +155,8 @@ bool is_shuffling(Move move, Stack* const ss, const Position& pos) {
 int v1 = 200;
 int v2 = 15;
 
-TUNE(v1);
-TUNE(SetRange(-100, 100), v2);
+TUNE(SetRange(0, 800), v1);
+TUNE(SetRange(-150, 150), v2);
 
 Search::Worker::Worker(SharedState&                    sharedState,
                        std::unique_ptr<ISearchManager> sm,

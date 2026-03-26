@@ -1246,7 +1246,7 @@ moves_loop:  // When in check, search starts here
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 428 / 4096;
 
-        r -= (ss - 1)->singularExtension * std::max(201 - 17 * depth, 0);
+        r -= (ss - 1)->singularExtension * std::max(180 - 25 * depth, 0);
 
         // Scale up reductions for expected ALL nodes
         if (allNode)

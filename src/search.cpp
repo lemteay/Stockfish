@@ -1151,7 +1151,8 @@ moves_loop:  // When in check, search starts here
             && is_valid(ttData.value) && !is_decisive(ttData.value) && (ttData.bound & BOUND_LOWER)
             && ttData.depth >= depth - 3 && !is_shuffling(move, ss, pos))
         {
-            Value singularBeta  = ttData.value - (60 + 66 * (ss->ttPv && !PvNode)) * depth / 55;
+            Value singularBeta = ttData.value - (60 + 66 * (ss->ttPv && !PvNode)) * depth / 55
+                               + (ss - 1)->singularExtension * 15;
             Depth singularDepth = newDepth / 2;
 
             ss->excludedMove = move;
@@ -1245,8 +1246,6 @@ moves_loop:  // When in check, search starts here
 
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 428 / 4096;
-
-        r -= (ss - 1)->singularExtension * 151;
 
         // Scale up reductions for expected ALL nodes
         if (allNode)

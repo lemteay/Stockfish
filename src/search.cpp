@@ -1137,6 +1137,8 @@ moves_loop:  // When in check, search starts here
             }
         }
 
+        ss->singularExtension = 0;
+
         // Step 15. Extensions
         // Singular extension search. If all moves but one
         // fail low on a search of (alpha-s, beta-s), and just one fails high on
@@ -1246,7 +1248,7 @@ moves_loop:  // When in check, search starts here
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 428 / 4096;
 
-        r -= (ss - 1)->singularExtension * std::max(201 - 17 * depth, 0);
+        r -= (ss - 1)->singularExtension * std::max(251 - 18 * depth, 0);
 
         // Scale up reductions for expected ALL nodes
         if (allNode)

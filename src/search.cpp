@@ -152,12 +152,6 @@ bool is_shuffling(Move move, Stack* const ss, const Position& pos) {
 
 }  // namespace
 
-int v1 = 3072;
-int v2 = 2048;
-int v3 = 3072;
-
-TUNE(v1, v2, v3)
-
 Search::Worker::Worker(SharedState&                    sharedState,
                        std::unique_ptr<ISearchManager> sm,
                        size_t                          threadId,
@@ -774,9 +768,9 @@ Value Search::Worker::search(
     opponentWorsening = ss->staticEval > -(ss - 1)->staticEval;
 
     // Hindsight adjustment of reductions based on static evaluation difference.
-    if (priorReduction >= v1 && !opponentWorsening)
+    if (priorReduction >= 3178 && !opponentWorsening)
         depth++;
-    if (priorReduction >= v2 && depth >= 2 && ss->staticEval + (ss - 1)->staticEval > 195)
+    if (priorReduction >= 2204 && depth >= 2 && ss->staticEval + (ss - 1)->staticEval > 195)
         depth--;
 
     // At non-PV nodes we check for an early TT cutoff
@@ -952,7 +946,7 @@ Value Search::Worker::search(
     // Step 10. Internal iterative reductions
     // At sufficient depth, reduce depth for PV/Cut nodes without a TTMove.
     // (*Scaler) Making IIR more aggressive scales poorly.
-    if (!ss->followPV && !allNode && depth >= 6 && !ttData.move && priorReduction <= v3)
+    if (!ss->followPV && !allNode && depth >= 6 && !ttData.move && priorReduction <= 3029)
         depth--;
 
     // Step 11. ProbCut

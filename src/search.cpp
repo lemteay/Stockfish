@@ -1253,7 +1253,7 @@ moves_loop:  // When in check, search starts here
             // std::clamp has been replaced by a more robust implementation.
             Depth d = std::max(1, std::min(newDepth - r / 1024, newDepth + 2)) + PvNode;
 
-            if (r > 10700)
+            if (r > 10300)
                 value = -qsearch<NonPV>(pos, ss + 1, -(alpha + 1), -alpha);
             else
             {

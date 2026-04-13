@@ -1253,7 +1253,8 @@ moves_loop:  // When in check, search starts here
             // std::clamp has been replaced by a more robust implementation.
             Depth d = std::max(1, std::min(newDepth - r / 1024, newDepth + 2)) + PvNode;
 
-            if (r > 9745)
+            dbg_hit_on(r > 9990);
+            if (r > 9990)
                 value = -qsearch<NonPV>(pos, ss + 1, -(alpha + 1), -alpha);
             else
             {

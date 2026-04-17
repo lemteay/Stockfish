@@ -1208,7 +1208,7 @@ moves_loop:  // When in check, search starts here
             r -= 2819 + PvNode * 973 + (ttData.value > alpha) * 905
                + (ttData.depth >= depth) * (935 + cutNode * 959);
 
-        r += 691;  // Base reduction offset to compensate for other tweaks
+        r += 613;  // Base reduction offset to compensate for other tweaks
         r -= moveCount * 65;
         r -= std::abs(correctionValue) / 25600;
 

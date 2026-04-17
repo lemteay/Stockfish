@@ -1243,6 +1243,12 @@ moves_loop:  // When in check, search starts here
         if (allNode)
             r += r * 273 / (256 * depth + 260);
 
+        // Priority-inheritance reduction: subtrees reached through a
+        // late move at the parent are low-priority regions of the global tree,
+        // so we can afford a larger reduction. Zero for parent's first move
+        // (typically the TT move) so the tuned baseline is preserved.
+        r += std::clamp((ss - 1)->moveCount - 1, 0, 15) * 32;
+
         // Step 17. Late moves reduction / extension (LMR)
         if (depth >= 2 && moveCount > 1)
         {

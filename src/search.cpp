@@ -81,14 +81,14 @@ using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
 // (*Scaler) All tuned parameters at time controls shorter than
 // optimized for require verifications at longer time controls
 
-int correction_value(const Worker& w, const Position& pos, const Stack* const ss) {
+std::pair<int, int> correction_value(const Worker& w, const Position& pos, const Stack* const ss) {
     const Color us     = pos.side_to_move();
     const auto  m      = (ss - 1)->currentMove;
     const auto& shared = w.sharedHistory;
-    const int   pcv    = shared.pawn_correction_entry(pos)[us].pawn;
-    const int   micv   = shared.minor_piece_correction_entry(pos)[us].minor;
-    const int   wnpcv  = shared.nonpawn_correction_entry<WHITE>(pos)[us].nonPawnWhite;
-    const int   bnpcv  = shared.nonpawn_correction_entry<BLACK>(pos)[us].nonPawnBlack;
+    const int   pcv    = 15341 * shared.pawn_correction_entry(pos)[us].pawn;
+    const int   micv   = 10569 * shared.minor_piece_correction_entry(pos)[us].minor;
+    const int   wnpcv  = 12906 * shared.nonpawn_correction_entry<WHITE>(pos)[us].nonPawnWhite;
+    const int   bnpcv  = 12906 * shared.nonpawn_correction_entry<BLACK>(pos)[us].nonPawnBlack;
     const int   cntcv =
       m.is_ok()
           ? 8761
@@ -96,7 +96,10 @@ int correction_value(const Worker& w, const Position& pos, const Stack* const ss
                + (*(ss - 4)->continuationCorrectionHistory)[pos.piece_on(m.to_sq())][m.to_sq()])
           : 64049;
 
-    return 15341 * pcv + 10569 * micv + 12906 * (wnpcv + bnpcv) + cntcv;
+    return {
+      pcv + micv + wnpcv + bnpcv + cntcv,
+      std::abs(pcv) + std::abs(micv) + std::abs(wnpcv) + std::abs(bnpcv) + std::abs(cntcv),
+    };
 }
 
 // Add correctionHistory value to raw staticEval and guarantee evaluation
@@ -794,7 +797,7 @@ Value Search::Worker::search(
     ss->statScore       = 0;
     (ss + 2)->cutoffCnt = 0;
 
-    const auto correctionValue = correction_value(*this, pos, ss);
+    const auto [correctionValue, correctionAbsSum] = correction_value(*this, pos, ss);
 
     // Step 4. Transposition table lookup
     excludedMove                   = ss->excludedMove;
@@ -1296,9 +1299,10 @@ moves_loop:  // When in check, search starts here
             r -= 3023 + PvNode * 1004 + (ttData.value > alpha) * 885
                + (ttData.depth >= depth) * (816 + cutNode * 940);
 
-        r += 697;  // Base reduction offset to compensate for other tweaks
+        r += 716;  // Base reduction offset to compensate for other tweaks
         r -= moveCount * 65;
         r -= std::abs(correctionValue) / 26310;
+        r -= std::max(0, 24 * 131072 - correctionAbsSum) / 8192;
 
         // Increase reduction for cut nodes
         if (cutNode)
@@ -1686,7 +1690,7 @@ Value Search::Worker::qsearch(Position& pos, Stack* ss, Value alpha, Value beta)
         bestValue = futilityBase = -VALUE_INFINITE;
     else
     {
-        const auto correctionValue = correction_value(*this, pos, ss);
+        const auto correctionValue = correction_value(*this, pos, ss).first;
 
         if (ss->ttHit)
         {
